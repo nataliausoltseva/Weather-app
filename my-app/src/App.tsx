@@ -1,24 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import { IUserInput } from './components/interfaces';
+import SearchBar from './components/SearchBar/SearchBar';
+import WeatherInformation from './components/WeatherInformation/WeatherInformation';
 
 function App() {
+  const [UserInput, setUserInput] = useState<IUserInput>({
+    SearchQuery:"Auckland"
+  });
+
+  function SetUserInput(a: IUserInput){
+    setUserInput(a);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchBar SetUserInput={(a: IUserInput) => SetUserInput(a)}/>
+      <WeatherInformation SearchQuery={UserInput.SearchQuery} />
     </div>
   );
 }
