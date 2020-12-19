@@ -25,7 +25,7 @@ function SearchBar(props: ISearchBarProps) {
     }
 
   return (
-    <div >
+    <div>
         <Grid container spacing={1}>
             <div>
                 <TextField 
