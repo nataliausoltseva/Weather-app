@@ -1,5 +1,10 @@
+import { Box } from '@material-ui/core';
+import Popover from '@material-ui/core/Popover';
+import Typography from '@material-ui/core/Typography';
+import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import React,{ useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import ScrollMenu from 'react-horizontal-scrolling-menu';
 
 //need to have a condition info about current day when calling the api
 interface CurrentInfo {
@@ -27,7 +32,8 @@ interface Condition {
 interface ForecastInfo{
     astro: Astro,
     day: Day,
-    hour: Hour[]
+    hour: Hour[],
+    date:string
 }
 
 interface Astro{
@@ -79,105 +85,115 @@ function WeatherInformation(props: IWEatherInformationProps) {
     
     const [locationInfo, setLocationInfo] = useState<LocationInfo>({country: "", lat:0, localtime:"", lon:0, name:""});
     
-    const [forecastInfo, setForecastInfo] = useState<ForecastInfo[]>([{astro:{moon_illumination:"", moon_phase:"",moonrise:"", moonset:"", sunrise:"", sunset:""}, day:{avghumidity:0, maxtemp_c:0, maxwind_kph:0, mintemp_c:0, uv:0}, hour:[{chance_of_rain:0, chance_of_snow:0, cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, temp_c:0, wind_degree:0, wind_kph:0, windchill_c:0, time:""}]}]);
+    const [firstForecastInfo, setFirstForecastInfo] = useState<ForecastInfo>({astro:{moon_illumination:"", moon_phase:"",moonrise:"", moonset:"", sunrise:"", sunset:""}, day:{avghumidity:0, maxtemp_c:0, maxwind_kph:0, mintemp_c:0, uv:0}, hour:[{chance_of_rain:0, chance_of_snow:0, cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, temp_c:0, wind_degree:0, wind_kph:0, windchill_c:0, time:""}],date:""});
+
+    const [secondForecastInfo, setSecondForecastInfo] = useState<ForecastInfo>({astro:{moon_illumination:"", moon_phase:"",moonrise:"", moonset:"", sunrise:"", sunset:""}, day:{avghumidity:0, maxtemp_c:0, maxwind_kph:0, mintemp_c:0, uv:0}, hour:[{chance_of_rain:0, chance_of_snow:0, cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, temp_c:0, wind_degree:0, wind_kph:0, windchill_c:0, time:""}],date:""});
+
+    const [thirdForecastInfo, setThirdForecastInfo] = useState<ForecastInfo>({astro:{moon_illumination:"", moon_phase:"",moonrise:"", moonset:"", sunrise:"", sunset:""}, day:{avghumidity:0, maxtemp_c:0, maxwind_kph:0, mintemp_c:0, uv:0},date:"", hour:[{chance_of_rain:0, chance_of_snow:0, cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, temp_c:0, wind_degree:0, wind_kph:0, windchill_c:0, time:""}]});
 
     useEffect(()=>{
         fetch(`https://weatherapi-com.p.rapidapi.com/forecast.json?q=${props.SearchQuery}&days=3`,{
-            headers:{
-                "x-rapidapi-key": `${process.env.REACT_APP_WEATHER_API_KEY}`,
-                "x-rapidapi-host": `${process.env.REACT_APP_WEATHER_HOST}`,
-            }
-        })
-        .then(response => response.json())
-        .then(response => {
-            
-            console.log(response);
-            setCurrentInfo(response.current);
-            setLocationInfo(response.location);
-            setForecastInfo(response.forecast.forecastday);
-        });
-    
+        headers:{
+            "x-rapidapi-key": `${process.env.REACT_APP_WEATHER_API_KEY}`,
+            "x-rapidapi-host": `${process.env.REACT_APP_WEATHER_HOST}`,
+        }
+    })
+    .then(response => response.json())
+    .then(response => {
+        
+        console.log(response);
+        setCurrentInfo(response.current);
+        setLocationInfo(response.location);
+        setFirstForecastInfo(response.forecast.forecastday[0]);
+        setSecondForecastInfo(response.forecast.forecastday[1]);
+        setThirdForecastInfo(response.forecast.forecastday[2]);
+        return;
+    });
     // eslint-disable-next-line
     },[props.SearchQuery]);
-    
+
     function firstDay(){
-        var hours = [];
-        for(var i=0; i<forecastInfo[0].hour.length;i++){
-            var newDate =  new Date(forecastInfo[0].hour[i].time);
+        var first_hours = [];
+        for(var i=0; i<firstForecastInfo.hour.length;i++){
+            var newDate =  new Date(firstForecastInfo.hour[i].time);
             var today = new Date(locationInfo.localtime);
             var newMin = newDate.getHours()*60 + newDate.getMinutes();
             var todayMin = today.getHours()*60 + today.getMinutes();
             if(newMin > todayMin){
                 var time = `${newDate.getHours()}:00`;
-                if(forecastInfo[0].hour[i].chance_of_rain !== 0){
-                    hours.push({"hour":time, "icon":forecastInfo[0].hour[i].condition.icon, "text":forecastInfo[0].hour[i].condition.text, "temp_c":forecastInfo[0].hour[i].temp_c, "chance_rain":forecastInfo[0].hour[i].chance_of_rain});
-                }
-                if(forecastInfo[0].hour[i].chance_of_snow !== 0){
-                    hours.push({"hour":time, "icon":forecastInfo[0].hour[i].condition.icon, "text":forecastInfo[0].hour[i].condition.text, "temp_c":forecastInfo[0].hour[i].temp_c, "chance_snow":forecastInfo[0].hour[i].chance_of_snow});
-                }
-                else{
-                    hours.push({"hour":time, "icon":forecastInfo[0].hour[i].condition.icon, "text":forecastInfo[0].hour[i].condition.text, "temp_c":forecastInfo[0].hour[i].temp_c});
-                }
+                first_hours.push({"hour":time, "icon":firstForecastInfo.hour[i].condition.icon, "text":firstForecastInfo.hour[i].condition.text, "temp_c":firstForecastInfo.hour[i].temp_c,"rain_chance":firstForecastInfo.hour[i].chance_of_rain,"snow_chance":firstForecastInfo.hour[i].chance_of_snow});
             }
         }
 
-        var body =(
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
-                {hours.map((item,i) => <li key={i}><img src={item.icon} alt={item.text}/> {item.text}, {item.hour}, {item.temp_c}°C</li>)}
-            </div>
-        );
-
+        var body = (
+            <ScrollMenu
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                data={first_hours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
+            />
+        )
         return body;
     }
 
     function secondDay(){
-        var hours = [];
-        for(var i=0; i<forecastInfo[1].hour.length;i++){
-            var newDate =  new Date(forecastInfo[1].hour[i].time);
+        var secondHours = [];
+        for(var i=0; i<secondForecastInfo.hour.length;i++){
+            var newDate =  new Date(secondForecastInfo.hour[i].time);
             var time = `${newDate.getHours()}:00`;
-            if(forecastInfo[1].hour[i].chance_of_rain !== 0){
-                hours.push({"hour":time, "icon":forecastInfo[1].hour[i].condition.icon, "text":forecastInfo[1].hour[i].condition.text, "temp_c":forecastInfo[1].hour[i].temp_c, "chance_rain":forecastInfo[1].hour[i].chance_of_rain});
-            }
-            if(forecastInfo[1].hour[i].chance_of_snow !== 0){
-                hours.push({"hour":time, "icon":forecastInfo[1].hour[i].condition.icon, "text":forecastInfo[1].hour[i].condition.text, "temp_c":forecastInfo[1].hour[i].temp_c, "chance_snow":forecastInfo[1].hour[i].chance_of_snow});
-            }
-            else{
-                hours.push({"hour":time, "icon":forecastInfo[1].hour[i].condition.icon, "text":forecastInfo[1].hour[i].condition.text, "temp_c":forecastInfo[1].hour[i].temp_c});
-            }
+            secondHours.push({"hour":time, "icon":secondForecastInfo.hour[i].condition.icon, "text":secondForecastInfo.hour[i].condition.text, "temp_c":secondForecastInfo.hour[i].temp_c,"rain_chance":secondForecastInfo.hour[i].chance_of_rain,"snow_chance":secondForecastInfo.hour[i].chance_of_snow});
+            
         }
-
-        var body =(
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
-                {hours.map((item,i) => <li key={i}><img src={item.icon} alt={item.text}/> {item.text}, {item.hour}, {item.temp_c}°C</li>)}
-            </div>
-        );
+        var body = (
+            <ScrollMenu
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                data={secondHours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
+            />);
 
         return body;
     }
 
-    function thirdDay(){
-        var hours = [];
-        for(var i=0; i<forecastInfo[2].hour.length;i++){
-            var newDate =  new Date(forecastInfo[2].hour[i].time);
+    function thirDay(){
+        var thirdHours = [];
+        for(var i=0; i<thirdForecastInfo.hour.length;i++){
+            var newDate =  new Date(thirdForecastInfo.hour[i].time);
             var time = `${newDate.getHours()}:00`;
-            if(forecastInfo[2].hour[i].chance_of_rain !== 0){
-                hours.push({"hour":time, "icon":forecastInfo[2].hour[i].condition.icon, "text":forecastInfo[2].hour[i].condition.text, "temp_c":forecastInfo[2].hour[i].temp_c, "chance_rain":forecastInfo[2].hour[i].chance_of_rain});
-            }
-            if(forecastInfo[2].hour[i].chance_of_snow !== 0){
-                hours.push({"hour":time, "icon":forecastInfo[2].hour[i].condition.icon, "text":forecastInfo[2].hour[i].condition.text, "temp_c":forecastInfo[2].hour[i].temp_c, "chance_snow":forecastInfo[2].hour[i].chance_of_snow});
-            }
-            else{
-                hours.push({"hour":time, "icon":forecastInfo[2].hour[i].condition.icon, "text":forecastInfo[2].hour[i].condition.text, "temp_c":forecastInfo[2].hour[i].temp_c});
-            }
+            thirdHours.push({"hour":time, "icon":thirdForecastInfo.hour[i].condition.icon, "text":thirdForecastInfo.hour[i].condition.text, "temp_c":thirdForecastInfo.hour[i].temp_c,"rain_chance":thirdForecastInfo.hour[i].chance_of_rain,"snow_chance":thirdForecastInfo.hour[i].chance_of_snow});
         }
 
         var body =(
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
-                {hours.map((item,i) => <li key={i}><img src={item.icon} alt={item.text}/> {item.text}, {item.hour}, {item.temp_c}°C</li>)}
-            </div>
-        );
-
+            <ScrollMenu
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                data={thirdHours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
+            />
+        )
         return body;
+    }
+
+    function changeDate(date:string){
+        var newDate = new Date(date);
+        var month = [];
+        month[0] = "Jan";
+        month[1] = "Feb";
+        month[2] = "Mar";
+        month[3] = "Apr";
+        month[4] = "May";
+        month[5] = "Jun";
+        month[6] = "Jul";
+        month[7] = "Aug";
+        month[8] = "Sept";
+        month[9] = "Oct";
+        month[10] = "Nov";
+        month[11] = "Dec";
+
+        var day = newDate.getDate();
+        if(day <10){
+            day = parseInt(`0${day}`);
+        }
+
+        return `${day} ${month[newDate.getMonth()]} ${newDate.getFullYear()}`;
+
     }
     return (
         <div>
@@ -196,46 +212,130 @@ function WeatherInformation(props: IWEatherInformationProps) {
                 <div>Feels like: {currentInfo.feelslike_c}°C</div>
                 <div>UV: {currentInfo.uv}
                     <div>
-                        Max UV: {forecastInfo[0].day.uv}
+                        Max UV: {firstForecastInfo.day.uv}
                     </div>
                 </div>
                 <div>Wind Direction: {currentInfo.wind_dir}</div>
                 <div>Wind speed: {currentInfo.wind_kph}km/h 
                     <div>
-                        Max Wind speed: {forecastInfo[0].day.maxwind_kph} km/h
+                        Max Wind speed: {firstForecastInfo.day.maxwind_kph} km/h
                     </div>
                 </div>
             </div>
             <div>
                 <div>
-                    MoonRise: {forecastInfo[0].astro.moonrise}
+                    MoonRise: {firstForecastInfo.astro.moonrise}
                 </div>
                 <div>
-                    MoonSet: {forecastInfo[0].astro.moonset}
+                    MoonSet: {firstForecastInfo.astro.moonset}
                 </div>
                 <div>
-                    Moon Phase: {forecastInfo[0].astro.moon_phase}
+                    Moon Phase: {firstForecastInfo.astro.moon_phase}
                 </div>
             </div>
             <div>
                 <div>
-                    SunRise: {forecastInfo[0].astro.sunrise}
+                    SunRise: {firstForecastInfo.astro.sunrise}
                 </div>
                 <div>
-                    SunSet: {forecastInfo[0].astro.sunset}
+                    SunSet: {firstForecastInfo.astro.sunset}
                 </div>
             </div>
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
+            <div>
                 {firstDay()}
             </div>
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
+            <div>
+                <strong style={{textAlign:"left",display:"flex", flexDirection:"row"}}>
+                    <div>
+                        {changeDate(secondForecastInfo.date)}
+                        <PopupState variant="popover" popupId="demo-popup-popover">
+                        {(popupState) => (
+                            <div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                {...bindTrigger(popupState)}
+                            >
+                                Open Popover
+                            </Button>
+                            <Popover
+                                {...bindPopover(popupState)}
+                                anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "center"
+                                }}
+                                transformOrigin={{
+                                vertical: "top",
+                                horizontal: "center"
+                                }}
+                            >
+                                <Box p={2}>
+                                <Typography component={'span'} variant={'body2'}>
+                                    <p>Moon rise: {secondForecastInfo.astro.moonrise}</p>
+                                    <p>Moon set: {secondForecastInfo.astro.moonset}</p>
+                                    <p>Moon phase: {secondForecastInfo.astro.moon_phase}</p>
+                                    <br/>
+                                    <p>Sun rise: {secondForecastInfo.astro.sunrise}</p>
+                                    <p>Sun set: {secondForecastInfo.astro.sunset}</p>
+                                    <br/>
+                                    <p>UV Level: {secondForecastInfo.day.uv}</p>
+                                    <p>Wind speed: {secondForecastInfo.day.maxwind_kph} km/h</p>
+                                </Typography>
+                                </Box>
+                            </Popover>
+                            </div>
+                        )}
+                        </PopupState>    
+                    </div>
+                </strong>
                 {secondDay()}
             </div>
-            <div style={{display:"flex", flexDirection:"row", listStyle:"none"}}>
-                {thirdDay()}
+            <div>
+                <strong style={{textAlign:"left",display:"flex", flexDirection:"row"}}>
+                    <div>
+                        {changeDate(thirdForecastInfo.date)}
+                        <PopupState variant="popover" popupId="demo-popup-popover">
+                        {(popupState) => (
+                            <div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                {...bindTrigger(popupState)}
+                            >
+                                Open Popover
+                            </Button>
+                            <Popover
+                                {...bindPopover(popupState)}
+                                anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "center"
+                                }}
+                                transformOrigin={{
+                                vertical: "top",
+                                horizontal: "center"
+                                }}
+                            >
+                                <Box p={2}>
+                                <Typography component={'span'} variant={'body2'}>
+                                    <p>Moon rise: {thirdForecastInfo.astro.moonrise}</p>
+                                    <p>Moon set: {thirdForecastInfo.astro.moonset}</p>
+                                    <p>Moon phase: {thirdForecastInfo.astro.moon_phase}</p>
+                                    <br/>
+                                    <p>Sun rise: {thirdForecastInfo.astro.sunrise}</p>
+                                    <p>Sun set: {thirdForecastInfo.astro.sunset}</p>
+                                    <br/>
+                                    <p>UV Level: {thirdForecastInfo.day.uv}</p>
+                                    <p>Wind speed: {thirdForecastInfo.day.maxwind_kph} km/h</p>
+                                </Typography>
+                                </Box>
+                            </Popover>
+                            </div>
+                        )}
+                        </PopupState>    
+                    </div>
+                </strong>
+                {thirDay()}
             </div>
-
-
         </div>
     );
 }
