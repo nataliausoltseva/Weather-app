@@ -1,10 +1,13 @@
-import { Box } from '@material-ui/core';
+import { Box, makeStyles, Modal } from '@material-ui/core';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
+import moment from 'moment';
 import React,{ useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+
 
 //need to have a condition info about current day when calling the api
 interface CurrentInfo {
@@ -18,7 +21,7 @@ interface CurrentInfo {
     uv: number,
     vis_km: number,
     wind_degree: number,
-    wind_dir: number,
+    wind_dir: string,
     wind_kph: number
 }
 
@@ -78,10 +81,41 @@ interface LocationInfo {
 interface IWEatherInformationProps {
     SearchQuery: (string|null);
 }
-
+  
+function rand() {
+    return Math.round(Math.random() * 20) - 10;
+  }
+  
+  function getModalStyle() {
+    const top = 50 + rand();
+    const left = 50 + rand();
+  
+    return {
+      top: `${top}%`,
+      left: `${left}%`,
+      transform: `translate(-${top}%, -${left}%)`,
+    };
+  }
+  
+  const useStyles = makeStyles((theme) => ({
+    paper: {
+      position: 'absolute',
+      width: 400,
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+    },
+  }));
+      
 function WeatherInformation(props: IWEatherInformationProps) {
+        
+    function importAll(r:any) {
+        return r.keys().map(r);
+    }
+    const images = importAll(require.context('../WindDirections', false, /.*\.png$/));
     
-    const [currentInfo, setCurrentInfo] = useState<CurrentInfo>({cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, gust_mph:0, humidity:0, pressure_mb:0, temp_c:0, uv:0, vis_km:0, wind_degree:0, wind_dir:0, wind_kph:0});
+    const [currentInfo, setCurrentInfo] = useState<CurrentInfo>({cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, gust_mph:0, humidity:0, pressure_mb:0, temp_c:0, uv:0, vis_km:0, wind_degree:0, wind_dir:"", wind_kph:0});
     
     const [locationInfo, setLocationInfo] = useState<LocationInfo>({country: "", lat:0, localtime:"", lon:0, name:""});
     
@@ -170,6 +204,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
         )
         return body;
     }
+    const classes = useStyles();
 
     function changeDate(date:string){
         var newDate = new Date(date);
@@ -191,36 +226,223 @@ function WeatherInformation(props: IWEatherInformationProps) {
         if(day <10){
             day = parseInt(`0${day}`);
         }
-
+        
         return `${day} ${month[newDate.getMonth()]} ${newDate.getFullYear()}`;
 
     }
+
+    function changeCurrentDate(date:string){
+        var dateValue = changeDate(date);
+        
+        var newDate = new Date(date);
+
+        return `${dateValue} ${moment(newDate).format("HH:mm")}`;
+
+    }
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+      };
+    
+    const handleClose = () => {
+    setOpen(false);
+    };
+
+    const [modalStyle] = React.useState(getModalStyle);
+    function checkUV(uvLevel:number){
+        var body;
+        if(uvLevel === 1 || uvLevel === 2){
+            body=(
+                <div style={{display:"flex", flexDirection:"row",marginLeft:"0.5em"}}>
+                    <Typography variant={'body2'}
+                    style={{textShadow:"2px 2px 4px green", fontWeight:"bold"}}
+                    >
+                    {uvLevel}
+                    </Typography>
+                    <HelpOutlineIcon onClick={handleOpen} fontSize="small" style={{marginLeft:"0.5em"}}/>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        >
+                        <Typography variant={'body2'} className={classes.paper} style={modalStyle}>
+                            <p><strong>Burn time:</strong> 60 minutes.</p>
+                            <p><strong>Recommended protection: </strong>sunscreen, SPF 30+, sunglasses</p> 
+                        </Typography>
+                    </Modal>
+                </div>
+            );
+        }
+        else if(uvLevel >= 3 && uvLevel <=5){
+            body=(
+                <div style={{display:"flex", flexDirection:"row",marginLeft:"0.5em"}}>
+                    <Typography variant={'body2'}
+                    style={{textShadow:"2px 2px 4px #F9F105", fontWeight:"bold"}}
+                    >
+                    {uvLevel}
+                    </Typography>
+                    <HelpOutlineIcon onClick={handleOpen} fontSize="small" style={{marginLeft:"0.5em"}}/>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        >
+                        <Typography variant={'body2'} className={classes.paper} style={modalStyle}>
+                            <p><strong>Burn time:</strong> 45 minutes.</p>
+                            <p><strong>Recommended protection: </strong>sunscreen, SPF 30+, sunglasses, hat</p> 
+                        </Typography>
+                    </Modal>
+                </div>
+            );
+        }
+        else if(uvLevel >= 6 && uvLevel <=7){
+            body=(
+                <div style={{display:"flex", flexDirection:"row",marginLeft:"0.5em"}}>
+                    <Typography variant={'body2'}
+                    style={{textShadow:"2px 2px 4px orange", fontWeight:"bold"}}
+                    >
+                    {uvLevel}
+                    </Typography>
+                    <HelpOutlineIcon onClick={handleOpen} fontSize="small" style={{marginLeft:"0.5em"}}/>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        >
+                        <Typography variant={'body2'} className={classes.paper} style={modalStyle}>
+                            <p><strong>Burn time:</strong> 30 minutes.</p>
+                            <p><strong>Recommended protection: </strong>sunscreen, SPF 30+, sunglasses, hat, seek shade</p> 
+                        </Typography>
+                    </Modal>
+                </div>
+            );
+        }
+        else if(uvLevel >= 8 && uvLevel <=10){
+            body=(
+                <div style={{display:"flex", flexDirection:"row",marginLeft:"0.5em"}}>
+                    <Typography variant={'body2'}
+                    style={{textShadow:"2px 2px 4px red", fontWeight:"bold"}}
+                    >
+                    {uvLevel}
+                    </Typography>
+                    <HelpOutlineIcon onClick={handleOpen} fontSize="small" style={{marginLeft:"0.5em"}}/>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        >
+                        <Typography variant={'body2'} className={classes.paper} style={modalStyle}>
+                            <p><strong>Burn time:</strong> 15-25 minutes.</p>
+                            <p><strong>Recommended protection: </strong>sunscreen, SPF 30+, sunglasses, hat, seek shade, protective clothing</p> 
+                        </Typography>
+                    </Modal>
+                </div>
+            );
+        }
+        else if(uvLevel >= 11){
+            body=(
+                <div style={{display:"flex", flexDirection:"row",marginLeft:"0.5em"}}>
+                    <Typography variant={'body2'}
+                    style={{textShadow:"2px 2px 4px purple", fontWeight:"bold"}}
+                    >
+                    {uvLevel}
+                    </Typography>
+                    <HelpOutlineIcon onClick={handleOpen} fontSize="small" style={{marginLeft:"0.5em"}}/>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                    >
+                        <Typography variant={'body2'} className={classes.paper} style={modalStyle}>
+                            <p><strong>Burn time:</strong> 15-25 minutes.</p>
+                            <p><strong>Recommended protection: </strong>sunscreen, SPF 30+, sunglasses, hat, seek shade, protective clothing, if possible stay inside between 10am-4pm.</p> 
+                        </Typography>
+                    </Modal>
+                    
+                </div>
+            );
+        }
+        return body;
+    }
+    
+    var windImgSrc;
+    switch(currentInfo.wind_dir){
+        case "E":
+            windImgSrc=images[0].default;
+            break;
+        case "ENE":
+            windImgSrc=images[1].default;
+            break;
+        case "ESE":
+            windImgSrc=images[2].default;
+            break;
+        case "N":
+            windImgSrc=images[3].default;
+            break;
+        case "NE":
+            windImgSrc=images[4].default;
+            break;
+        case "NNE":   
+            windImgSrc=images[5].default;
+            break;
+        case "NNW":
+            windImgSrc=images[6].default;
+            break;
+        case "NW":
+            windImgSrc=images[7].default;
+            break;
+        case "S":
+            windImgSrc=images[8].default;
+            break;
+        case "SE":
+            windImgSrc=images[9].default;
+            break;
+        case "SSE":
+            windImgSrc=images[10].default;
+            break;
+        case "SSW":
+            windImgSrc=images[11].default;
+            break;
+        case "SW":
+            windImgSrc=images[12].default;
+            break;
+        case "W":
+            windImgSrc=images[13].default;
+            break;
+        case "WNW":
+            windImgSrc=images[14].default;
+            break;
+        case "WSW":
+            windImgSrc=images[15].default;
+            break;
+    }
+    console.log(images);
     return (
         <div>
-            <div style={{textAlign:"left"}}>
-                {locationInfo.name}, {locationInfo.country}
-            </div>
-            <div style={{textAlign:"left"}}>
-                {locationInfo.localtime}
-            </div>
-            <div>
-                <div style={{textAlign:"left"}}>
+            <div style={{position:"relative",left:"2em"}}>
+                <strong>{locationInfo.name}, {locationInfo.country}</strong>
+                <br/>
+                {changeCurrentDate(locationInfo.localtime)}
+                <div style={{left:"2em",top:"3em"}}>
                     {currentInfo.condition.text}
+                    <br/>
                     <img src={currentInfo.condition.icon} alt={currentInfo.condition.text} />
+                    <div style={{fontSize:25}}>{currentInfo.temp_c}°C</div>
                 </div>
-                <div>Temperature: {currentInfo.temp_c}°C</div>
-                <div>Feels like: {currentInfo.feelslike_c}°C</div>
-                <div>UV: {currentInfo.uv}
-                    <div>
-                        Max UV: {firstForecastInfo.day.uv}
-                    </div>
+            </div>
+            <div style={{position:"relative", top:0}}>
+                <div style={{display:"flex", flexDirection:"row"}}>
+                    UV: {checkUV(currentInfo.uv)}
                 </div>
-                <div>Wind Direction: {currentInfo.wind_dir}</div>
-                <div>Wind speed: {currentInfo.wind_kph}km/h 
-                    <div>
-                        Max Wind speed: {firstForecastInfo.day.maxwind_kph} km/h
-                    </div>
+                <div style={{display:"flex", flexDirection:"row"}}>
+                        Max UV: {checkUV(firstForecastInfo.day.uv)}
                 </div>
+                <div>Wind: <img src={windImgSrc} alt={currentInfo.wind_dir} height={25}/>{currentInfo.wind_kph} km/h </div>
             </div>
             <div>
                 <div>
@@ -278,7 +500,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                     <p>Sun rise: {secondForecastInfo.astro.sunrise}</p>
                                     <p>Sun set: {secondForecastInfo.astro.sunset}</p>
                                     <br/>
-                                    <p>UV Level: {secondForecastInfo.day.uv}</p>
+                                    <p style={{display:"flex", flexDirection:"row"}} >Max UV Level: {checkUV(secondForecastInfo.day.uv)}</p>
                                     <p>Wind speed: {secondForecastInfo.day.maxwind_kph} km/h</p>
                                 </Typography>
                                 </Box>
@@ -324,7 +546,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                     <p>Sun rise: {thirdForecastInfo.astro.sunrise}</p>
                                     <p>Sun set: {thirdForecastInfo.astro.sunset}</p>
                                     <br/>
-                                    <p>UV Level: {thirdForecastInfo.day.uv}</p>
+                                    <p style={{display:"flex", flexDirection:"row"}}>Max UV Level: {checkUV(thirdForecastInfo.day.uv)}</p>
                                     <p>Wind speed: {thirdForecastInfo.day.maxwind_kph} km/h</p>
                                 </Typography>
                                 </Box>
