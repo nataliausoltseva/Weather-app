@@ -113,7 +113,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
     function importAll(r:any) {
         return r.keys().map(r);
     }
-    const images = importAll(require.context('../WindDirections', false, /.*\.png$/));
+    const windImages = importAll(require.context('../WindDirections', false, /.*\.png$/));
+    const moonImages = importAll(require.context('../MoonPhases', false, /.*\.PNG$/));
     
     const [currentInfo, setCurrentInfo] = useState<CurrentInfo>({cloud:0, condition:{text:"", icon:"", code:0}, feelslike_c:0, gust_mph:0, humidity:0, pressure_mb:0, temp_c:0, uv:0, vis_km:0, wind_degree:0, wind_dir:"", wind_kph:0});
     
@@ -373,97 +374,135 @@ function WeatherInformation(props: IWEatherInformationProps) {
     var windImgSrc;
     switch(currentInfo.wind_dir){
         case "E":
-            windImgSrc=images[0].default;
+            windImgSrc=windImages[0].default;
             break;
         case "ENE":
-            windImgSrc=images[1].default;
+            windImgSrc=windImages[1].default;
             break;
         case "ESE":
-            windImgSrc=images[2].default;
+            windImgSrc=windImages[2].default;
             break;
         case "N":
-            windImgSrc=images[3].default;
+            windImgSrc=windImages[3].default;
             break;
         case "NE":
-            windImgSrc=images[4].default;
+            windImgSrc=windImages[4].default;
             break;
         case "NNE":   
-            windImgSrc=images[5].default;
+            windImgSrc=windImages[5].default;
             break;
         case "NNW":
-            windImgSrc=images[6].default;
+            windImgSrc=windImages[6].default;
             break;
         case "NW":
-            windImgSrc=images[7].default;
+            windImgSrc=windImages[7].default;
             break;
         case "S":
-            windImgSrc=images[8].default;
+            windImgSrc=windImages[8].default;
             break;
         case "SE":
-            windImgSrc=images[9].default;
+            windImgSrc=windImages[9].default;
             break;
         case "SSE":
-            windImgSrc=images[10].default;
+            windImgSrc=windImages[10].default;
             break;
         case "SSW":
-            windImgSrc=images[11].default;
+            windImgSrc=windImages[11].default;
             break;
         case "SW":
-            windImgSrc=images[12].default;
+            windImgSrc=windImages[12].default;
             break;
         case "W":
-            windImgSrc=images[13].default;
+            windImgSrc=windImages[13].default;
             break;
         case "WNW":
-            windImgSrc=images[14].default;
+            windImgSrc=windImages[14].default;
             break;
         case "WSW":
-            windImgSrc=images[15].default;
+            windImgSrc=windImages[15].default;
             break;
     }
-    console.log(images);
+
+    
+    function getMoonPhase(moonPhase:string){
+        var moonImgSrc:any;
+        switch(moonPhase){
+            case "First Quarter":
+                moonImgSrc=moonImages[0].default;
+                break;
+            case "Full Moon":
+                moonImgSrc=moonImages[1].default;
+                break;
+            case "Last Quarter":
+                moonImgSrc=moonImages[2].default;
+                break;
+            case "New Moon":
+                moonImgSrc=moonImages[3].default;
+                break;
+            case "Waning Crescent":
+                moonImgSrc=moonImages[4].default;
+                break;
+            case "Waning Gibbous":   
+                moonImgSrc=moonImages[5].default;
+                break;
+            case "Waxing Crescecnt":
+                moonImgSrc=moonImages[6].default;
+                break;
+            case "Waxing Gibbous":
+                moonImgSrc=moonImages[7].default;
+                break;
+        }
+
+        var body = (
+        <img src={moonImgSrc} alt={moonPhase} height={25} style={{marginLeft:"0.5em", marginRight:"0.5em"}}/> 
+        );
+
+        return body;
+    }
     return (
-        <div>
-            <div style={{position:"relative",left:"2em"}}>
-                <strong>{locationInfo.name}, {locationInfo.country}</strong>
-                <br/>
-                {changeCurrentDate(locationInfo.localtime)}
-                <div style={{left:"2em",top:"3em"}}>
-                    {currentInfo.condition.text}
+        <div style={{fontSize:"1em"}}>
+            <div style={{display:"flex", flexDirection:"row"}}>
+                <div style={{marginLeft:"2em"}}>
+                    <strong>{locationInfo.name}, {locationInfo.country}</strong>
                     <br/>
-                    <img src={currentInfo.condition.icon} alt={currentInfo.condition.text} />
-                    <div style={{fontSize:25}}>{currentInfo.temp_c}°C</div>
+                    {changeCurrentDate(locationInfo.localtime)}
+                    <div style={{left:"2em",top:"3em"}}>
+                        {currentInfo.condition.text}
+                        <br/>
+                        <div style={{ fontSize:25,display:"flex", flexDirection:"row"}}>
+                            <img src={currentInfo.condition.icon} alt={currentInfo.condition.text} />
+                            <div style={{marginTop:"0.5em"}}>{currentInfo.temp_c}°C</div>
+                        </div>
+                    </div>
+                </div>
+                <div style={{marginLeft:"10%"}}>
+                    <div style={{display:"flex", flexDirection:"row"}}>
+                        UV: {checkUV(currentInfo.uv)}
+                    </div>
+                    <div style={{display:"flex", flexDirection:"row"}}>
+                            Max UV: {checkUV(firstForecastInfo.day.uv)}
+                    </div>
+                    <div>Wind: <img src={windImgSrc} alt={currentInfo.wind_dir} height={25}/>{currentInfo.wind_kph} km/h </div>
+                </div>
+                <div style={{marginRight:"2em"}}>
+                    <div>
+                        MoonRise: {firstForecastInfo.astro.moonrise}
+                    </div>
+                    <div>
+                        MoonSet: {firstForecastInfo.astro.moonset}
+                    </div>
+                    <div style={{display:"flex", flexDirection:"row"}}>
+                        Moon Phase: {getMoonPhase(firstForecastInfo.astro.moon_phase)} {firstForecastInfo.astro.moon_phase}
+                    </div>
+                    <div>
+                        SunRise: {firstForecastInfo.astro.sunrise}
+                    </div>
+                    <div>
+                        SunSet: {firstForecastInfo.astro.sunset}
+                    </div>
                 </div>
             </div>
-            <div style={{position:"relative", top:0}}>
-                <div style={{display:"flex", flexDirection:"row"}}>
-                    UV: {checkUV(currentInfo.uv)}
-                </div>
-                <div style={{display:"flex", flexDirection:"row"}}>
-                        Max UV: {checkUV(firstForecastInfo.day.uv)}
-                </div>
-                <div>Wind: <img src={windImgSrc} alt={currentInfo.wind_dir} height={25}/>{currentInfo.wind_kph} km/h </div>
-            </div>
-            <div>
-                <div>
-                    MoonRise: {firstForecastInfo.astro.moonrise}
-                </div>
-                <div>
-                    MoonSet: {firstForecastInfo.astro.moonset}
-                </div>
-                <div>
-                    Moon Phase: {firstForecastInfo.astro.moon_phase}
-                </div>
-            </div>
-            <div>
-                <div>
-                    SunRise: {firstForecastInfo.astro.sunrise}
-                </div>
-                <div>
-                    SunSet: {firstForecastInfo.astro.sunset}
-                </div>
-            </div>
-            <div>
+            <div style={{position:"relative"}}>
                 {firstDay()}
             </div>
             <div>
@@ -495,7 +534,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                 <Typography component={'span'} variant={'body2'}>
                                     <p>Moon rise: {secondForecastInfo.astro.moonrise}</p>
                                     <p>Moon set: {secondForecastInfo.astro.moonset}</p>
-                                    <p>Moon phase: {secondForecastInfo.astro.moon_phase}</p>
+                                    <p style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(secondForecastInfo.astro.moon_phase)} {secondForecastInfo.astro.moon_phase}</p>
                                     <br/>
                                     <p>Sun rise: {secondForecastInfo.astro.sunrise}</p>
                                     <p>Sun set: {secondForecastInfo.astro.sunset}</p>
@@ -541,7 +580,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                 <Typography component={'span'} variant={'body2'}>
                                     <p>Moon rise: {thirdForecastInfo.astro.moonrise}</p>
                                     <p>Moon set: {thirdForecastInfo.astro.moonset}</p>
-                                    <p>Moon phase: {thirdForecastInfo.astro.moon_phase}</p>
+                                    <p style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(thirdForecastInfo.astro.moon_phase)} {thirdForecastInfo.astro.moon_phase}</p>
                                     <br/>
                                     <p>Sun rise: {thirdForecastInfo.astro.sunrise}</p>
                                     <p>Sun set: {thirdForecastInfo.astro.sunset}</p>
