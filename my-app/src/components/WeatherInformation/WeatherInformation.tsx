@@ -162,8 +162,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
 
         var body = (
             <ScrollMenu
-                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
-                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0", marginLeft:"1em" }}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0", marginRight:"1em" }}>{" > "}</div>}
                 data={first_hours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
             />
         )
@@ -180,8 +180,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
         }
         var body = (
             <ScrollMenu
-                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
-                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0"}}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0",marginRight:"1em"}}>{" > "}</div>}
                 data={secondHours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
             />);
 
@@ -198,8 +198,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
 
         var body =(
             <ScrollMenu
-                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"pink" }}>{" < "}</div>}
-                arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+                arrowLeft={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0"}}>{" < "}</div>}
+                arrowRight={<div style={{ fontSize: "30px", backgroundColor:"#D0D0D0" ,marginRight:"1em"}}>{" > "}</div>}
                 data={thirdHours.map((item,i) => <li key={i} style={{listStyle:"none",display:"flex", flexDirection:"column", margin:"20px"}}><img src={item.icon} alt={item.text}/><strong><div>{item.rain_chance>0?`${item.rain_chance}%`:""}</div></strong><strong><div>{item.snow_chance>0?`${item.snow_chance}%`:""}</div></strong><div>{item.hour} </div> <div>{item.temp_c}°C</div></li>)}
             />
         )
@@ -505,7 +505,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
             <div style={{position:"relative"}}>
                 {firstDay()}
             </div>
-            <div>
+            <div style={{marginLeft:"2em"}}>
                 <strong style={{textAlign:"left",display:"flex", flexDirection:"row"}}>
                     <div>
                         {changeDate(secondForecastInfo.date)}
@@ -551,7 +551,7 @@ function WeatherInformation(props: IWEatherInformationProps) {
                 </strong>
                 {secondDay()}
             </div>
-            <div>
+            <div style={{marginLeft:"2em"}}>
                 <strong style={{textAlign:"left",display:"flex", flexDirection:"row"}}>
                     <div>
                         {changeDate(thirdForecastInfo.date)}
