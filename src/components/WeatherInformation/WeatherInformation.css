@@ -1,0 +1,10 @@
+.Grid-Item {
+    margin-left: 20%;
+}
+
+/* Mobile Phone */
+@media screen and (max-width: 540px) {
+    .Grid-Item {
+        text-align: center;
+    }  
+}

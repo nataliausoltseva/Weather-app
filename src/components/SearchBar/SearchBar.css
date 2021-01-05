@@ -1,0 +1,6 @@
+/* Mobile Phone */
+@media screen and (max-width: 540px) {
+    .Search-Bar {
+        width:10em;
+    } 
+}

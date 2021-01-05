@@ -1,4 +1,4 @@
-import { Box, makeStyles, Modal } from '@material-ui/core';
+import { Box, Grid, makeStyles, Modal } from '@material-ui/core';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import PopupState, { bindPopover, bindTrigger } from 'material-ui-popup-state';
@@ -7,9 +7,8 @@ import React,{ useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ScrollMenu from 'react-horizontal-scrolling-menu';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import './WeatherInformation.css';
 
-
-//need to have a condition info about current day when calling the api
 interface CurrentInfo {
     cloud: number,
     condition: Condition,
@@ -31,7 +30,6 @@ interface Condition {
     code: number
 }
 
-//array
 interface ForecastInfo{
     astro: Astro,
     day: Day,
@@ -56,7 +54,6 @@ interface Day{
     uv: number
 }
 
-//array
 interface Hour{
     chance_of_rain:number,
     chance_of_snow: number,
@@ -105,7 +102,7 @@ function rand() {
       border: '2px solid #000',
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
-    },
+    }
   }));
       
 function WeatherInformation(props: IWEatherInformationProps) {
@@ -136,7 +133,6 @@ function WeatherInformation(props: IWEatherInformationProps) {
     .then(response => response.json())
     .then(response => {
         
-        console.log(response);
         setCurrentInfo(response.current);
         setLocationInfo(response.location);
         setFirstForecastInfo(response.forecast.forecastday[0]);
@@ -461,21 +457,21 @@ function WeatherInformation(props: IWEatherInformationProps) {
     }
     return (
         <div style={{fontSize:"1em"}}>
-            <div style={{display:"flex", flexDirection:"row"}}>
-                <div style={{marginLeft:"2em"}}>
+            <Grid container direction="row" justify="center" alignItems="baseline" spacing={5}>
+                <Grid item md={3} >
                     <strong>{locationInfo.name}, {locationInfo.country}</strong>
-                    <br/>
-                    {changeCurrentDate(locationInfo.localtime)}
-                    <div style={{left:"2em",top:"3em"}}>
-                        {currentInfo.condition.text}
+                        <br/>
+                        {changeCurrentDate(locationInfo.localtime)}
+                        <div >
+                            {currentInfo.condition.text}
                         <br/>
                         <div style={{ fontSize:25,display:"flex", flexDirection:"row"}}>
                             <img src={currentInfo.condition.icon} alt={currentInfo.condition.text} />
-                            <div style={{marginTop:"0.5em"}}>{currentInfo.temp_c}°C</div>
+                        <div style={{marginTop:"0.5em"}}>{currentInfo.temp_c}°C</div>
                         </div>
                     </div>
-                </div>
-                <div style={{marginLeft:"10%"}}>
+                </Grid>
+                <Grid  item md={3} >
                     <div style={{display:"flex", flexDirection:"row"}}>
                         UV: {checkUV(currentInfo.uv)}
                     </div>
@@ -483,8 +479,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
                             Max UV: {checkUV(firstForecastInfo.day.uv)}
                     </div>
                     <div>Wind: <img src={windImgSrc} alt={currentInfo.wind_dir} height={25}/>{currentInfo.wind_kph} km/h </div>
-                </div>
-                <div style={{marginRight:"2em"}}>
+                </Grid>
+                <Grid  item md={3}>
                     <div>
                         MoonRise: {firstForecastInfo.astro.moonrise}
                     </div>
@@ -500,8 +496,8 @@ function WeatherInformation(props: IWEatherInformationProps) {
                     <div>
                         SunSet: {firstForecastInfo.astro.sunset}
                     </div>
-                </div>
-            </div>
+                </Grid>                
+            </Grid>
             <div style={{position:"relative"}}>
                 {firstDay()}
             </div>
@@ -531,16 +527,16 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                 }}
                             >
                                 <Box p={2}>
-                                <Typography component={'span'} variant={'body2'}>
-                                    <p>Moon rise: {secondForecastInfo.astro.moonrise}</p>
-                                    <p>Moon set: {secondForecastInfo.astro.moonset}</p>
-                                    <p style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(secondForecastInfo.astro.moon_phase)} {secondForecastInfo.astro.moon_phase}</p>
+                                <Typography component={'p'} variant={'body2'}>
+                                    <div>Moon rise: {secondForecastInfo.astro.moonrise}</div>
+                                    <div>Moon set: {secondForecastInfo.astro.moonset}</div>
+                                    <div style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(secondForecastInfo.astro.moon_phase)} {secondForecastInfo.astro.moon_phase}</div>
                                     <br/>
-                                    <p>Sun rise: {secondForecastInfo.astro.sunrise}</p>
-                                    <p>Sun set: {secondForecastInfo.astro.sunset}</p>
+                                    <div>Sun rise: {secondForecastInfo.astro.sunrise}</div>
+                                    <div>Sun set: {secondForecastInfo.astro.sunset}</div>
                                     <br/>
-                                    <p style={{display:"flex", flexDirection:"row"}} >Max UV Level: {checkUV(secondForecastInfo.day.uv)}</p>
-                                    <p>Wind speed: {secondForecastInfo.day.maxwind_kph} km/h</p>
+                                    <div style={{display:"flex", flexDirection:"row"}} >Max UV Level: {checkUV(secondForecastInfo.day.uv)}</div>
+                                    <div>Wind speed: {secondForecastInfo.day.maxwind_kph} km/h</div>
                                 </Typography>
                                 </Box>
                             </Popover>
@@ -577,16 +573,16 @@ function WeatherInformation(props: IWEatherInformationProps) {
                                 }}
                             >
                                 <Box p={2}>
-                                <Typography component={'span'} variant={'body2'}>
-                                    <p>Moon rise: {thirdForecastInfo.astro.moonrise}</p>
-                                    <p>Moon set: {thirdForecastInfo.astro.moonset}</p>
-                                    <p style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(thirdForecastInfo.astro.moon_phase)} {thirdForecastInfo.astro.moon_phase}</p>
+                                <Typography component={'p'} variant={'body2'}>
+                                    <div>Moon rise: {thirdForecastInfo.astro.moonrise}</div>
+                                    <div>Moon set: {thirdForecastInfo.astro.moonset}</div>
+                                    <div style={{display:"flex", flexDirection:"row"}}>Moon phase: {getMoonPhase(thirdForecastInfo.astro.moon_phase)} {thirdForecastInfo.astro.moon_phase}</div>
                                     <br/>
-                                    <p>Sun rise: {thirdForecastInfo.astro.sunrise}</p>
-                                    <p>Sun set: {thirdForecastInfo.astro.sunset}</p>
+                                    <div>Sun rise: {thirdForecastInfo.astro.sunrise}</div>
+                                    <div>Sun set: {thirdForecastInfo.astro.sunset}</div>
                                     <br/>
-                                    <p style={{display:"flex", flexDirection:"row"}}>Max UV Level: {checkUV(thirdForecastInfo.day.uv)}</p>
-                                    <p>Wind speed: {thirdForecastInfo.day.maxwind_kph} km/h</p>
+                                    <div style={{display:"flex", flexDirection:"row"}}>Max UV Level: {checkUV(thirdForecastInfo.day.uv)}</div>
+                                    <div>Wind speed: {thirdForecastInfo.day.maxwind_kph} km/h</div>
                                 </Typography>
                                 </Box>
                             </Popover>

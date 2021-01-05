@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { IUserInput } from '../interfaces';
-import {Grid, TextField} from '@material-ui/core';
+import {TextField} from '@material-ui/core';
 import Button from 'react-bootstrap/Button';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import './SearchBar.css';
 
 interface ISearchBarProps {
     SetUserInput: (a: IUserInput) => void;
@@ -34,22 +35,21 @@ function SearchBar(props: ISearchBarProps) {
 
   return (
     <div className="SearchBarContainer">
-        <Grid container spacing={1} >
-            <div style={{margin:"auto", display:"flex", justifyContent:"center", marginTop:"20px"}}>
+        <div style={{margin:"auto", display:"flex", justifyContent:"center", marginTop:"20px"}}>
+                
             <Autocomplete
                 id="combo-box-demo"
                 options={citiesTyped}
                 getOptionLabel={(option) => option}
-                style={{ width: 300, }}
+                style={{ width: 200 }}
                 onChange={(event, value)=> checkValue(value)}
-                renderInput={(params) => <TextField {...params} label="Combo box" variant="outlined" onChange={event => handleSearchQueryChange(event.target.value)} style={{height:"5em"}}/>}
+                renderInput={(params) => <TextField {...params} label="City name" variant="outlined" onChange={event => handleSearchQueryChange(event.target.value)} style={{height:"5em"}} className="Search-Bar"/>}
                 />
 
-                <Button variant="primary" size="sm" onClick={handleSubmit} style={{width:"6rem", height:"4em", marginTop:"2px"}}>
-                    Search
-                </Button>
-            </div>
-        </Grid>
+            <Button variant="primary" size="sm" onClick={handleSubmit} style={{width:"6em", height:"4em"}}>
+                Search
+            </Button>
+        </div>
     </div>
   );
 }
