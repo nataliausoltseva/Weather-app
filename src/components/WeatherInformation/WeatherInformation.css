@@ -1,10 +1,59 @@
 .Grid-Item {
     margin-left: 20%;
 }
+.ArrowDown {
+    margin-left: 0.5em;
+    cursor: pointer;
+    background-color: #ebebeb;
+}
+.ArrowDown:hover{
+    background-color: lightgrey;
+}
+
+.HelpButton{
+    margin-left: 0.5em;
+    cursor: pointer;
+    
+}
+
+.HelpButton:hover{
+    background-color: lightgrey;
+}
+
+.CloseIcon{
+    margin-left: 100%;
+    cursor: pointer;
+}
+
+.CloseIcon:hover{
+    background-color: lightgrey;
+}
+
+.LeftArrow{
+    font-size: 30px;
+    font-weight: bolder;
+    cursor: pointer;
+}
+
+.LeftArrow:hover{
+    background-color: lightgrey;
+}
+
+.RightArrow{
+    font-size: 30px;
+    font-weight: bolder;
+    cursor: pointer;
+    margin-right: 1em;
+}
+
+.RightArrow:hover{
+    background-color: lightgrey;
+}
 
 /* Mobile Phone */
 @media screen and (max-width: 540px) {
     .Grid-Item {
         text-align: center;
     }  
+
 }

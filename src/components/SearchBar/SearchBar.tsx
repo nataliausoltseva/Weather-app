@@ -41,12 +41,12 @@ function SearchBar(props: ISearchBarProps) {
                 id="combo-box-demo"
                 options={citiesTyped}
                 getOptionLabel={(option) => option}
-                style={{ width: 200 }}
+                style={{ width: 200, cursor:"pointer" }}
                 onChange={(event, value)=> checkValue(value)}
                 renderInput={(params) => <TextField {...params} label="City name" variant="outlined" onChange={event => handleSearchQueryChange(event.target.value)} style={{height:"5em"}} className="Search-Bar"/>}
                 />
 
-            <Button variant="primary" size="sm" onClick={handleSubmit} style={{width:"6em", height:"4em"}}>
+            <Button variant="primary" size="sm" onClick={handleSubmit} style={{width:"6em", height:"4em", cursor:"pointer"}}>
                 Search
             </Button>
         </div>
