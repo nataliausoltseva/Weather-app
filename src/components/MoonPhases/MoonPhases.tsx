@@ -12,24 +12,25 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     }
-  }));
-  function rand() {
-    return Math.round(Math.random() * 20) - 10;
-  }
-  function getModalStyle() {
-    const top = 50 + rand();
-    const left = 50 + rand();
-  
-    return {
-      top: `${top}%`,
-      left: `${left}%`,
-      transform: `translate(-${top}%, -${left}%)`,
-    };
-  }
-  
-  interface Props {
-      moonPhase: string;
-  }
+}));
+function rand() {
+return Math.round(Math.random() * 20) - 10;
+}
+function getModalStyle() {
+const top = 50 + rand();
+const left = 50 + rand();
+
+return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+};
+}
+
+interface Props {
+    moonPhase: string;
+}
+
 export const MoonPhases = (props: Props) => {
     const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
@@ -110,7 +111,7 @@ export const MoonPhases = (props: Props) => {
                     </Typography>
                 );
                 break;
-            case "Waxing Crescecnt":
+            case "Waxing Crescent":
                 moonPhaseCard=(
                     <Typography component={'span'} variant={'body2'} className={classes.paper} style={modalStyle}>
                         <CloseIcon onClick={handleCloseMoonPhaseModal} className="CloseIcon"/>
@@ -136,8 +137,7 @@ export const MoonPhases = (props: Props) => {
     }
     return(
         <div>
-            <Images list={moonImages} name={props.moonPhase} /> {props.moonPhase}
-            <button onClick={()=> handleOpenMoonPhaseModal()}>click</button>
+            <Images list={moonImages} name={props.moonPhase} handleOnClick={handleOpenMoonPhaseModal}/> {props.moonPhase}
             <Modal
                 open={openMoonPhaseModal}
                 onClose={handleCloseMoonPhaseModal}

@@ -1,8 +1,9 @@
 import React from 'react';
 
 interface Props{
-    list:any
-    name?:string
+    list:any,
+    name?:string,
+    handleOnClick?: () => void
 }
 export const Images = (props:Props)=> {
     function getSrc(){
@@ -13,6 +14,6 @@ export const Images = (props:Props)=> {
         }
     }
     return(
-        <img src={getSrc()} alt={props.name} />
+        <img src={getSrc()} alt={props.name} height={25} onClick={props.handleOnClick} />
     )
 }
