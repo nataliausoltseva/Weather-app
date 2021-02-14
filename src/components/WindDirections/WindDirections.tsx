@@ -1,5 +1,4 @@
 import React from 'react';
-import { Images } from '../Images';
 
 interface Props {
     windDirection?:string,

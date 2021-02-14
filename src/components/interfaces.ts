@@ -70,3 +70,15 @@ export interface LocationInfo {
 export interface IWEatherInformationProps {
     SearchQuery: (string|null);
 }
+
+export interface CityHomePage {
+    forecastInfo: CurrentInfo,
+    locationInfo: LocationInfo
+}
+
+export interface CitiesSearch {
+    name:string,
+    country: string,
+    lat: number,
+    long: number
+}
